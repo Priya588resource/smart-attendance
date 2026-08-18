@@ -1,0 +1,106 @@
+let attendance = JSON.parse(localStorage.getItem("attendance")) || [];
+
+function addAttendance() {
+    const name = document.getElementById("studentName").value.trim();
+    const roll = document.getElementById("studentRoll").value.trim();
+    const status = document.getElementById("attendanceStatus").value;
+
+    if (name === "" || roll === "") {
+        alert("Please enter student name and roll number.");
+        return;
+    }
+
+    const student = {
+        id: Date.now(),
+        name: name,
+        roll: roll,
+        status: status
+    };
+
+    attendance.push(student);
+
+    saveData();
+    displayAttendance();
+
+    document.getElementById("studentName").value = "";
+    document.getElementById("studentRoll").value = "";
+}
+
+function displayAttendance() {
+    const table = document.getElementById("attendanceTable");
+
+    table.innerHTML = "";
+
+    attendance.forEach((student, index) => {
+        const row = document.createElement("tr");
+
+        const statusClass =
+            student.status === "Present"
+                ? "present-status"
+                : "absent-status";
+
+        row.innerHTML = `
+            <td>${index + 1}</td>
+            <td>${student.name}</td>
+            <td>${student.roll}</td>
+            <td class="${statusClass}">
+                ${student.status}
+            </td>
+            <td>
+                <button class="delete-btn"
+                    onclick="deleteAttendance(${student.id})">
+                    Delete
+                </button>
+            </td>
+        `;
+
+        table.appendChild(row);
+    });
+
+    updateSummary();
+}
+
+function deleteAttendance(id) {
+    attendance = attendance.filter(student => student.id !== id);
+
+    saveData();
+    displayAttendance();
+}
+
+function clearAttendance() {
+    if (attendance.length === 0) {
+        return;
+    }
+
+    if (confirm("Are you sure you want to clear all attendance?")) {
+        attendance = [];
+
+        saveData();
+        displayAttendance();
+    }
+}
+
+function updateSummary() {
+    const total = attendance.length;
+
+    const present = attendance.filter(
+        student => student.status === "Present"
+    ).length;
+
+    const absent = attendance.filter(
+        student => student.status === "Absent"
+    ).length;
+
+    document.getElementById("total").textContent = total;
+    document.getElementById("present").textContent = present;
+    document.getElementById("absent").textContent = absent;
+}
+
+function saveData() {
+    localStorage.setItem(
+        "attendance",
+        JSON.stringify(attendance)
+    );
+}
+
+displayAttendance();
