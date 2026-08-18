@@ -1,0 +1,12 @@
+function markAttendance() {
+    const name = document.getElementById("name").value;
+    const result = document.getElementById("result");
+
+    if (name.trim() === "") {
+        result.innerText = "Please enter student name";
+        return;
+    }
+
+    const time = new Date().toLocaleTimeString();
+    result.innerText = name + " is Present at " + time;
+}
